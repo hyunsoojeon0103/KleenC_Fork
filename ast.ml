@@ -9,6 +9,21 @@ type expr =
   | BoolLit of bool
   | Id of string
   | Binop of expr * op * expr
+  | Float of float
+  | Malloc of string * expr 
+  (* sanity check: we want a heap variable to
+     be assigned to a string value,
+     Assign takes a string * expr
+     so the malloc / heap val must be of type expr
+   *) 
+  | Deref of expr
+  | AddrOf of expr
+  | Void of expr 
+  | ArrayRange of string * expr * expr 
+  | ArrayToEnd of string * expr
+  | ArrayFromStart of string * expr
+  | ArrayFull of string
+  | CharSec of string 
   | Assign of string * expr
   (* function call *)
   | Call of string * expr list

@@ -4,7 +4,8 @@
 open Ast
 %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE PLUS MINUS ASSIGN MOD
+%token SEMI LPAREN RPAREN LBRACE RBRACE 
+%token PLUS MINUS ASSIGN MOD
 %token COLON LBRACKET RBRACKET QUOTE
 %token EQ NEQ LT AND OR NOT
 %token IF ELSE WHILE INT BOOL VOID HEAP CHARSEQ FLOAT
@@ -14,11 +15,12 @@ open Ast
 %token <int> LITERAL
 %token <bool> BLIT
 %token <string> ID
+%token <float> FLOAT
 %token EOF
 
 %start program
 %type <Ast.program> program
-
+%right LPAREN RPAREN LBRACE RBRACE
 %right ASSIGN
 %left OR
 %left AND
@@ -89,6 +91,7 @@ expr:
     LITERAL          { Literal($1)            }
   | BLIT             { BoolLit($1)            }
   | ID               { Id($1)                 }
+  | FLOAT            { Float($1)              }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
   | expr EQ     expr { Binop($1, Equal, $3)   }
@@ -96,11 +99,19 @@ expr:
   | expr LT     expr { Binop($1, Less,  $3)   }
   | expr AND    expr { Binop($1, And,   $3)   }
   | expr OR     expr { Binop($1, Or,    $3)   }
+  | HEAP ID          { Malloc ($2)            }
+  | DEREFERENCE expr { Deref ($2)             } 
+  | POINTER expr     { AddrOf ($2)            }
+  | CHARSEQ LITERAL  { CharSec ($2)           }
+  | VOID expr        { Void ($2)              } 
+  | ID RBRACKET LITERAL COLON LITERAL LBRACKET { ArrayRange ($1 , $3, $5) }
+  | ID RBRACKET LITERAL COLON LBRACKET { ArrayToEnd ($1, $3) }
+  | ID RBRACKET COLON LITERAL LBRACKET { ArrayFromStart ($1) }
+  | ID RBRACKET COLON LBRACKET { ArrayFull ($1) }
   | ID ASSIGN expr   { Assign($1, $3)         }
   | LPAREN expr RPAREN { $2                   }
   /* call */
   | ID LPAREN args_opt RPAREN { Call ($1, $3)  }
-
 /* args_opt*/
 args_opt:
   /*nothing*/ { [] }

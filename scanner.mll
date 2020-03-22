@@ -43,6 +43,7 @@ rule token = parse
 | "true"   { BLIT(true)  }
 | "false"  { BLIT(false) }
 | digit+ as lem  { LITERAL(int_of_string lem) }
+| digit+ (('.')(digit*))? | digit* (('.')(digit+)) {FLOAT(int_of_string lem) } (* floats don't need digits after decimal so this has to be kleene star not the + operator, since + REQUIRES digits.. *)
 | letter (digit | letter | '_')* as lem { ID(lem) }
 | eof { EOF }
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
