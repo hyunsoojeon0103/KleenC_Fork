@@ -2,7 +2,7 @@
 
 type op = Add | Sub | Equal | Neq | Less | And | Or
 
-type typ = Int | Bool
+type typ = Int | Bool | Charseq
 
 type expr =
     Literal of int
@@ -10,12 +10,13 @@ type expr =
   | Id of string
   | Binop of expr * op * expr
   | Float of float
-  | Malloc of string * expr 
+  (*| Malloc of string * expr *)
   (* sanity check: we want a heap variable to
      be assigned to a string value,
      Assign takes a string * expr
      so the malloc / heap val must be of type expr
    *) 
+  | Malloc of string
   | Deref of expr
   | AddrOf of expr
   | Void of expr 
@@ -23,7 +24,7 @@ type expr =
   | ArrayToEnd of string * expr
   | ArrayFromStart of string * expr
   | ArrayFull of string
-  | CharSec of string 
+  (*| CharSec of string *)
   | Assign of string * expr
   (* function call *)
   | Call of string * expr list
@@ -70,6 +71,7 @@ let rec string_of_expr = function
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | _ -> "finish later"
 
 let rec string_of_stmt = function
     Block(stmts) ->
@@ -83,6 +85,7 @@ let rec string_of_stmt = function
 let string_of_typ = function
     Int -> "int"
   | Bool -> "bool"
+  | Charseq -> "charseq"
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 
