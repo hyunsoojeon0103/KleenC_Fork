@@ -20,13 +20,18 @@ open Ast
 
 %start program
 %type <Ast.program> program
-%right LPAREN RPAREN LBRACE RBRACE
+%left DEREFERENCE POINTER VOID
+%left SEMI 
+%left LPAREN RPAREN LBRACE RBRACE
+
 %right ASSIGN
 %left OR
 %left AND
 %left EQ NEQ
 %left LT
 %left PLUS MINUS
+
+
 
 %%
 
