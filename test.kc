@@ -22,11 +22,11 @@ int main()
     cs = "(0.0)  (-_-)  (^_^)";
     i = 0;
 
-    prints("Demoing post-increment, charseq and string literals");
+    printout("Demoing post-increment, charseq and string literals");
     
     while ( i < 5 )
     {
-	prints(cs);
+	printout(cs);
 	i++;
     }
   

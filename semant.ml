@@ -35,7 +35,7 @@ let check (globals, functions) =
     in List.fold_left add_bind StringMap.empty 
 	[
 	  ("print",  [(Int, "x")], Int);
-	  ("prints", [(Charseq, "x")], Void)]
+	  ("printout", [(Charseq, "x")], Void)]
   in
     (*
     StringMap.add "print" {
