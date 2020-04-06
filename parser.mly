@@ -1,28 +1,21 @@
-/* Ocamlyacc parser for MicroC */
+/* Ocamlyacc parser for KleenC */
 
 %{
 open Ast
 %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE 
-%token PLUS MINUS ASSIGN MOD
-%token COLON LBRACKET RBRACKET QUOTE
-%token EQ NEQ LT AND OR NOT
-%token IF ELSE WHILE INT BOOL VOID HEAP CHARSEQ
-%token DEREFERENCE POINTER
+%token SEMI LPAREN RPAREN LBRACE RBRACE PLUS MINUS ASSIGN INCREMENT DECREMENT
+%token EQ NEQ LT AND OR
+%token IF ELSE WHILE INT BOOL HEAP VOID CHARSEQ 
 /* return, COMMA token */
 %token RETURN COMMA
 %token <int> LITERAL
 %token <bool> BLIT
-%token <string> ID
-%token <float> FLOAT
+%token <string> ID STRLIT 
 %token EOF
 
 %start program
 %type <Ast.program> program
-%left DEREFERENCE POINTER VOID
-%left SEMI 
-%left LPAREN RPAREN LBRACE RBRACE
 
 %right ASSIGN
 %left OR
@@ -30,8 +23,8 @@ open Ast
 %left EQ NEQ
 %left LT
 %left PLUS MINUS
-
-
+%left INCREMENT
+%left DECREMENT
 
 %%
 
@@ -55,7 +48,9 @@ vdecl:
 typ:
     INT   { Int   }
   | BOOL  { Bool  }
+  | HEAP  { Heap }
   | CHARSEQ { Charseq }
+  | VOID  { Void }
 
 /* fdecl */
 fdecl:
@@ -96,9 +91,8 @@ stmt:
 expr:
     LITERAL          { Literal($1)            }
   | BLIT             { BoolLit($1)            }
-  | HEAP ID          { Malloc ($2)            }
+  | STRLIT	     { StrLit($1)	      }
   | ID               { Id($1)                 }
-  | FLOAT            { Float($1)              }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
   | expr EQ     expr { Binop($1, Equal, $3)   }
@@ -106,17 +100,13 @@ expr:
   | expr LT     expr { Binop($1, Less,  $3)   }
   | expr AND    expr { Binop($1, And,   $3)   }
   | expr OR     expr { Binop($1, Or,    $3)   }
-  | DEREFERENCE expr { Deref ($2)             } 
-  | POINTER expr     { AddrOf ($2)            }
-  | VOID expr        { Void ($2)              } 
-  | ID RBRACKET expr COLON expr LBRACKET { ArrayRange ($1 , $3, $5) }
-  | ID RBRACKET expr COLON LBRACKET { ArrayToEnd ($1, $3) }
-  | ID RBRACKET COLON expr LBRACKET { ArrayFromStart ($1, $4) }
-  | ID RBRACKET COLON LBRACKET { ArrayFull ($1) }
+  | expr INCREMENT   { Unop(Inc, $1)	      }
+  | expr DECREMENT   { Unop(Dec, $1)	      }
   | ID ASSIGN expr   { Assign($1, $3)         }
   | LPAREN expr RPAREN { $2                   }
   /* call */
   | ID LPAREN args_opt RPAREN { Call ($1, $3)  }
+
 /* args_opt*/
 args_opt:
   /*nothing*/ { [] }
@@ -125,4 +115,3 @@ args_opt:
 args:
   expr  { [$1] }
   | expr COMMA args { $1::$3 }
-
