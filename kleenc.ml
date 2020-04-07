@@ -12,7 +12,9 @@ let () =
     ("-s", Arg.Unit (set_action Sast), "Print the SAST");
     ("-l", Arg.Unit (set_action LLVM_IR), "Print the generated LLVM IR");
   ] in
+
   let usage_msg = "usage: ./kleenc.native [-a|-s|-l] [file.mc]" in
+
   let channel = ref stdin in
   Arg.parse speclist (fun filename -> channel := open_in filename) usage_msg;
 
@@ -21,6 +23,7 @@ let () =
   let ast = Parser.program Scanner.token lexbuf in
   match !action with
     Ast -> print_string (Ast.string_of_program ast)
+
   | _ -> let sast = Semant.check ast in
     match !action with
       Ast     -> ()
