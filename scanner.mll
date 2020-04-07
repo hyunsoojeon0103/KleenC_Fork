@@ -6,15 +6,18 @@ let digit = ['0'-'9']
 let letter = ['a'-'z' 'A'-'Z']
 
 rule token = parse
-  [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
-| "(:"     { comment lexbuf }           (* Comments *)
+  [' ' '\t' '\r' '\n'] { token lexbuf }
+| "(:"     { comment lexbuf }
+(* SYNTAX *)
 | '('      { LPAREN }
 | ')'      { RPAREN }
 | '{'      { LBRACE }
 | '}'      { RBRACE }
+| '['	   { LBRACKET }
+| ']'	   { RBRACKET }
 | ';'      { SEMI }
-(* COMMA *)
 | ','      { COMMA }
+(* OPERATORS *)
 | '+'      { PLUS }
 | '-'      { MINUS }
 | '='      { ASSIGN }
@@ -23,20 +26,22 @@ rule token = parse
 | '<'      { LT }
 | "&&"     { AND }
 | "||"     { OR }
+| "++"	   { INCREMENT }
+| "--"     { DECREMENT }
+(* CONTROL *)
 | "if"     { IF }
 | "else"   { ELSE }
 | "while"  { WHILE }
-| "++"	   { INCREMENT }
-| "--"     { DECREMENT }
-(* RETURN *)
 | "return" { RETURN }
+(* TYPE *)
 | "int"    { INT }
 | "bool"   { BOOL }
 | "charseq" { CHARSEQ } 
-| "true"   { BLIT(true)  }
-| "false"  { BLIT(false) }
 | "heap"   { HEAP }
 | "void"   { VOID }
+(* LITERALS *)
+| "true"   { BLIT(true)  }
+| "false"  { BLIT(false) }
 | digit+ as lem  { LITERAL(int_of_string lem) }
 | letter (digit | letter | '_')* as lem { ID(lem) }
 | '"' ([^ '"']* as lxm) '"'  { STRLIT(lxm) }

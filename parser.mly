@@ -4,11 +4,15 @@
 open Ast
 %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE PLUS MINUS ASSIGN INCREMENT DECREMENT
-%token EQ NEQ LT AND OR
-%token IF ELSE WHILE INT BOOL HEAP VOID CHARSEQ 
-/* return, COMMA token */
-%token RETURN COMMA
+/* SYNTAX */
+%token SEMI COMMA LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET
+/* OPERATOR */
+%token PLUS MINUS INCREMENT DECREMENT ASSIGN EQ NEQ LT AND OR
+/* TYPE */
+%token INT BOOL HEAP VOID CHARSEQ
+/* CONTROL */
+%token RETURN IF ELSE WHILE
+/* LITERAL */
 %token <int> LITERAL
 %token <bool> BLIT
 %token <string> ID STRLIT 
@@ -103,9 +107,11 @@ expr:
   | expr INCREMENT   { Unop(Inc, $1)	      }
   | expr DECREMENT   { Unop(Dec, $1)	      }
   | ID ASSIGN expr   { Assign($1, $3)         }
+  | ID LPAREN args_opt RPAREN { Call ($1, $3) }
   | LPAREN expr RPAREN { $2                   }
-  /* call */
-  | ID LPAREN args_opt RPAREN { Call ($1, $3)  }
+  | LBRACKET expr RBRACKET { $2		      }
+  
+
 
 /* args_opt*/
 args_opt:
