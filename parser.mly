@@ -7,7 +7,7 @@ open Ast
 /* SYNTAX */
 %token SEMI COLON QUOTE COMMA LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET
 /* OPERATOR */
-%token PLUS MINUS DIV INCREMENT DECREMENT ASSIGN EQ NEQ LT NOT AND OR DEREFERENCE POINTER
+%token PLUS MINUS MULT DIV MOD INCREMENT DECREMENT ASSIGN EQ NEQ LT NOT AND OR DEREFERENCE POINTER
 /* TYPE */
 %token INT BOOL HEAP VOID CHARSEQ FLOAT
 /* CONTROL */
@@ -27,6 +27,7 @@ open Ast
 %left EQ NEQ
 %left LT
 %left PLUS MINUS
+%left MULT DIV MOD
 %left INCREMENT
 %left DECREMENT
 
@@ -104,7 +105,9 @@ expr:
   | ID               { Id($1)                 }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
+  | expr MULT   expr { Binop($1, Mult,   $3)  }
   | expr DIV    expr { Binop($1, Div,   $3)   }
+  | expr MOD    expr { Binop($1, Mod,   $3)   }
   | expr EQ     expr { Binop($1, Equal, $3)   }
   | expr NEQ    expr { Binop($1, Neq, $3)     }
   | expr LT     expr { Binop($1, Less,  $3)   }

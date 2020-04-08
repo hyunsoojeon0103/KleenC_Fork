@@ -128,8 +128,8 @@ let check (globals, functions) =
         if t1 = t2 then
           (* Determine expression type based on operator and operand types *)
           let t = match op with
-              Add | Sub | Div when t1 = Int -> Int
-	    | Add | Sub | Div when t1 = Float -> Float
+              Add | Sub | Mod when t1 = Int -> Int
+	    | Add | Sub | Mult | Div when t1 = Float -> Float
             | Equal | Neq -> Bool
             | Less when t1 = Int -> Bool
             | And | Or when t1 = Bool -> Bool

@@ -20,12 +20,13 @@ rule token = parse
 | ':'	   { COLON }	
 | ','      { COMMA }
 | "'\""	   { QUOTE }
-| '*'	   { DEREFERENCE }
 | '&'      { POINTER }
 (* OPERATORS *)
 | '+'      { PLUS }
 | '-'      { MINUS }
+| '*'	   { MULT }
 | '/'      { DIV }
+| '%'	   { MOD }
 | '='      { ASSIGN }
 | "=="     { EQ }
 | "!="     { NEQ }

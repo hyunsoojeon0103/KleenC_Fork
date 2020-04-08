@@ -21,16 +21,29 @@ int main()
     
     (:
 	type casting not yet supported
-	ex) 10 / 2.0 -> error
     :)
+    
+    printCS("Adding 2.0 + 7.0");
+    printFloat(2.0 + 7.0);
+
+    printCS("Subtracting 2.0 - 7.0");
+    printFloat(2.0 - 7.0);
+
+    printCS("Multiplying 2.0 * 5.0");
+    printFloat(2.0 * 5.0);
+
     printCS("Dividing 10.0 / 2.0");
     printFloat(10.0/2.0);
+    
+    printCS("Moding 14 % 8");
+    printInt(14 % 8);
 
     printCS("For loop");
     for(i = 0; i < 3; i++)
     {
 	printInt(i);
     }
-  
+    
+    
     return 0;
 }

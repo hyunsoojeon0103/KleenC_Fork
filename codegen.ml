@@ -118,19 +118,36 @@ let translate (globals, functions) =
       | SId s       -> L.build_load (lookup s) s builder
       | SAssign (s, e) -> let e' = build_expr builder e in
         ignore(L.build_store e' (lookup s) builder); e'
-      | SBinop (e1, op, e2) ->
+      (*| SBinop (e1, op, e2) when e1 = A.Int && e2 = A.Int ->*)
+      | SBinop (((ty1, _) as e1), op, ((ty2, _) as e2)) when ty1 = A.Int && ty2 = A.Int ->
         let e1' = build_expr builder e1
         and e2' = build_expr builder e2 in
         (match op with
            A.Add     -> L.build_add
          | A.Sub     -> L.build_sub
-	 | A.Div     -> L.build_fdiv
+	 | A.Mod     -> L.build_srem
          | A.And     -> L.build_and
          | A.Or      -> L.build_or
          | A.Equal   -> L.build_icmp L.Icmp.Eq
          | A.Neq     -> L.build_icmp L.Icmp.Ne
          | A.Less    -> L.build_icmp L.Icmp.Slt
+	 | _         -> raise (Failure "not supported yet")
         ) e1' e2' "tmp" builder
+
+      | SBinop (e1, op, e2) ->
+        let e1' = build_expr builder e1
+        and e2' = build_expr builder e2 in
+        (match op with
+           A.Add     -> L.build_fadd
+         | A.Sub     -> L.build_fsub
+	 | A.Mult    -> L.build_fmul
+	 | A.Div     -> L.build_fdiv
+         | A.Equal   -> L.build_fcmp L.Fcmp.Oeq
+         | A.Neq     -> L.build_fcmp L.Fcmp.One
+         | A.Less    -> L.build_fcmp L.Fcmp.Olt
+	 | _         -> raise (Failure "maybe not supported yet")
+        ) e1' e2' "tmp" builder
+
       | SUnop(op, ((t, ex) as e)) ->
 	    let e' = build_expr builder e in
 		(match op with
