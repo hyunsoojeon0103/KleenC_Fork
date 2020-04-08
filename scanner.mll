@@ -16,10 +16,15 @@ rule token = parse
 | '['	   { LBRACKET }
 | ']'	   { RBRACKET }
 | ';'      { SEMI }
+| ':'	   { COLON }	
 | ','      { COMMA }
+| "'\""	   { QUOTE }
+| '*'	   { DEREFERENCE }
+| '&'      { POINTER }
 (* OPERATORS *)
 | '+'      { PLUS }
 | '-'      { MINUS }
+| '%'      { MOD }
 | '='      { ASSIGN }
 | "=="     { EQ }
 | "!="     { NEQ }
@@ -28,6 +33,7 @@ rule token = parse
 | "||"     { OR }
 | "++"	   { INCREMENT }
 | "--"     { DECREMENT }
+| '!'	   { NOT }
 (* CONTROL *)
 | "if"     { IF }
 | "else"   { ELSE }
