@@ -34,8 +34,10 @@ let check (globals, functions) =
       locals = []; body = [] } map
     in List.fold_left add_bind StringMap.empty 
 	[
-	  ("print",  [(Int, "x")], Int);
-	  ("printout", [(Charseq, "x")], Void)]
+	  ("printInt",  [(Int, "x")], Int);
+	  ("printFloat", [(Float, "x")], Void);
+	  ("printCS", [(Charseq, "x")], Void)
+	]
   in
     (*
     StringMap.add "print" {
@@ -94,8 +96,10 @@ let check (globals, functions) =
     (* Return a semantically-checked expression, i.e., with a type *)
     let rec check_expr = function
         Literal l -> (Int, SLiteral l)
+      | FloatLit l -> (Float, SFloatLit l)
       | BoolLit l -> (Bool, SBoolLit l)
       | StrLit l -> (Charseq, SStrLit l)
+      | Noexpr   -> (Void, SNoexpr)
       | Id var -> (type_of_identifier var, SId var)
       | Assign(var, e) as ex ->
         let lt = type_of_identifier var
@@ -124,7 +128,8 @@ let check (globals, functions) =
         if t1 = t2 then
           (* Determine expression type based on operator and operand types *)
           let t = match op with
-              Add | Sub when t1 = Int -> Int
+              Add | Sub | Div when t1 = Int -> Int
+	    | Add | Sub | Div when t1 = Float -> Float
             | Equal | Neq -> Bool
             | Less when t1 = Int -> Bool
             | And | Or when t1 = Bool -> Bool
@@ -169,6 +174,8 @@ let check (globals, functions) =
         SIf(check_bool_expr e, check_stmt st1, check_stmt st2)
       | While(e, st) ->
         SWhile(check_bool_expr e, check_stmt st)
+      | For(e1, e2, e3, st) ->
+	    SFor(check_expr e1, check_bool_expr e2, check_expr e3, check_stmt st) 
       | Return e ->
         let (t, e') = check_expr e in
         if t = func.rtyp then SReturn (t, e')

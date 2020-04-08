@@ -1,13 +1,14 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
-type op = Add | Sub | Equal | Neq | Less | And | Or
+type op = Add | Sub | Div | Equal | Neq | Less | And | Or
 
 type uop = Inc | Dec
 
-type typ = Int | Bool | Heap | Void | Charseq 
+type typ = Int | Bool | Heap | Void | Charseq | Float
 
 type expr =
     Literal of int
+  | FloatLit of string
   | BoolLit of bool
   | StrLit of string
   | Id of string
@@ -16,12 +17,14 @@ type expr =
   | Assign of string * expr
   (* function call *)
   | Call of string * expr list
+  | Noexpr
 
 type stmt =
     Block of stmt list
   | Expr of expr
   | If of expr * stmt * stmt
   | While of expr * stmt
+  | For of expr * expr * expr * stmt
   (* return *)
   | Return of expr
 
@@ -43,6 +46,7 @@ type program = bind list * func_def list
 let string_of_op = function
     Add -> "+"
   | Sub -> "-"
+  | Div -> "/"
   | Equal -> "=="
   | Neq -> "!="
   | Less -> "<"
@@ -55,6 +59,7 @@ let string_of_uop = function
 
 let rec string_of_expr = function
     Literal(l) -> string_of_int l
+  | FloatLit(l)  -> l
   | BoolLit(true) -> "true"
   | BoolLit(false) -> "false"
   | StrLit(s)	-> s
@@ -65,6 +70,7 @@ let rec string_of_expr = function
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | Noexpr-> ""
 
 let rec string_of_stmt = function
     Block(stmts) ->
@@ -74,6 +80,9 @@ let rec string_of_stmt = function
   | If(e, s1, s2) ->  "if (" ^ string_of_expr e ^ ")\n" ^
                       string_of_stmt s1 ^ "else\n" ^ string_of_stmt s2
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
+  | For(e1, e2, e3, s) ->
+  	 	    "for (" ^ string_of_expr e1  ^ " ; " ^ string_of_expr e2 ^ " ; " ^
+      		    string_of_expr e3  ^ ") " ^ string_of_stmt s
 
 let string_of_typ = function
     Int -> "int"
@@ -81,6 +90,7 @@ let string_of_typ = function
   | Heap -> "heap"
   | Void -> "void"
   | Charseq -> "charseq"
+  | Float  -> "float"
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 

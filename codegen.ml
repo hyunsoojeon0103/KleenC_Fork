@@ -33,6 +33,7 @@ let translate (globals, functions) =
   and heap_t	 = L.pointer_type (L.named_struct_type context "Heap")
   and void_t	 = L.void_type	 context
   and pointer_t  = L.pointer_type
+  and float_t    = L.double_type context
   in
 
 
@@ -43,12 +44,15 @@ let translate (globals, functions) =
     | A.Heap  -> heap_t
     | A.Void  -> void_t
     | A.Charseq -> pointer_t i8_t
+    | A.Float  -> float_t
   in
 
   (* Create a map of global variables after creating each *)
   let global_vars : L.llvalue StringMap.t =
     let global_var m (t, n) =
-      let init = L.const_int (ltype_of_typ t) 0
+      let init = match t with
+	 A.Float -> L.const_float (ltype_of_typ t) 0.0
+	 | _ -> L.const_int (ltype_of_typ t) 0 
       in StringMap.add n (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
 
@@ -73,7 +77,8 @@ let translate (globals, functions) =
     let (the_function, _) = StringMap.find fdecl.sfname function_decls in
     let builder = L.builder_at_end context (L.entry_block the_function) in
 
-    let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder 
+    let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder
+    and float_format_str = L.build_global_stringptr "%f\n" "fmt" builder
     and string_format_str = L.build_global_stringptr "%s\n" "fmt" builder in
 
     (* Construct the function's "locals": formal arguments and locally
@@ -107,6 +112,7 @@ let translate (globals, functions) =
     (* Construct code for an expression; return its value *)
     let rec build_expr builder ((_, e) : sexpr) = match e with
         SLiteral i  -> L.const_int i32_t i
+      | SFloatLit l -> L.const_float_of_string float_t l 
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
       | SStrLit s   -> L.build_global_stringptr s "tmp" builder
       | SId s       -> L.build_load (lookup s) s builder
@@ -118,6 +124,7 @@ let translate (globals, functions) =
         (match op with
            A.Add     -> L.build_add
          | A.Sub     -> L.build_sub
+	 | A.Div     -> L.build_fdiv
          | A.And     -> L.build_and
          | A.Or      -> L.build_or
          | A.Equal   -> L.build_icmp L.Icmp.Eq
@@ -137,10 +144,13 @@ let translate (globals, functions) =
 			| _ -> raise (Failure "decrement error"))) builder
 		)
 		
-      | SCall ("print", [e]) ->
+      | SCall ("printInt", [e]) ->
         L.build_call printf_func [| int_format_str ; (build_expr builder e) |]
           "printf" builder
-      | SCall ("printout", [e]) ->
+      | SCall ("printFloat", [e]) ->
+        L.build_call printf_func [| float_format_str ; (build_expr builder e) |]
+          "printf" builder 
+      | SCall ("printCS", [e]) ->
         L.build_call printf_func [| string_format_str; (build_expr builder e) |]
           "printf" builder  
       | SCall (f, args) ->
@@ -148,6 +158,7 @@ let translate (globals, functions) =
         let llargs = List.rev (List.map (build_expr builder) (List.rev args)) in
         let result = f ^ "_result" in
         L.build_call fdef (Array.of_list llargs) result builder
+      | SNoexpr      -> L.const_int i32_t 0 
     in
 
     (* LLVM insists each basic block end with exactly one "terminator"
@@ -196,6 +207,9 @@ let translate (globals, functions) =
 
         ignore(L.build_cond_br bool_val body_bb end_bb while_builder);
         L.builder_at_end context end_bb
+
+      | SFor (e1, e2, e3, body) -> build_stmt builder
+	(SBlock [SExpr e1; SWhile (e2, SBlock [body; SExpr e3]) ] )
 
     in
     (* Build the code for each statement in the function *)

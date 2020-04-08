@@ -7,15 +7,15 @@ open Ast
 /* SYNTAX */
 %token SEMI COLON QUOTE COMMA LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET
 /* OPERATOR */
-%token PLUS MINUS MOD INCREMENT DECREMENT ASSIGN EQ NEQ LT NOT AND OR DEREFERENCE POINTER
+%token PLUS MINUS DIV INCREMENT DECREMENT ASSIGN EQ NEQ LT NOT AND OR DEREFERENCE POINTER
 /* TYPE */
-%token INT BOOL HEAP VOID CHARSEQ
+%token INT BOOL HEAP VOID CHARSEQ FLOAT
 /* CONTROL */
-%token RETURN IF ELSE WHILE
+%token RETURN IF ELSE WHILE FOR
 /* LITERAL */
 %token <int> LITERAL
 %token <bool> BLIT
-%token <string> ID STRLIT 
+%token <string> ID STRLIT FLIT
 %token EOF
 
 %start program
@@ -55,6 +55,7 @@ typ:
   | HEAP  { Heap }
   | CHARSEQ { Charseq }
   | VOID  { Void }
+  | FLOAT { Float }
 
 /* fdecl */
 fdecl:
@@ -85,20 +86,25 @@ stmt_list:
 stmt:
     expr SEMI                               { Expr $1      }
   | LBRACE stmt_list RBRACE                 { Block $2 }
-  /* if (condition) { block1} else {block2} */
-  /* if (condition) stmt else stmt */
   | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7) }
   | WHILE LPAREN expr RPAREN stmt           { While ($3, $5)  }
-  /* return */
+  | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt
+					    { For($3, $5, $7, $9) }
   | RETURN expr SEMI                        { Return $2      }
+
+expr_opt:
+		     { Noexpr }
+  | expr    	     { $1     }
 
 expr:
     LITERAL          { Literal($1)            }
+  | FLIT  	     { FloatLit($1)	      } 
   | BLIT             { BoolLit($1)            }
   | STRLIT	     { StrLit($1)	      }
   | ID               { Id($1)                 }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
+  | expr DIV    expr { Binop($1, Div,   $3)   }
   | expr EQ     expr { Binop($1, Equal, $3)   }
   | expr NEQ    expr { Binop($1, Neq, $3)     }
   | expr LT     expr { Binop($1, Less,  $3)   }

@@ -5,6 +5,7 @@ open Ast
 type sexpr = typ * sx
 and sx =
     SLiteral of int
+  | SFloatLit of string
   | SBoolLit of bool
   | SStrLit of string
   | SId of string
@@ -13,12 +14,14 @@ and sx =
   | SAssign of string * sexpr
   (* call *)
   | SCall of string * sexpr list
+  | SNoexpr
 
 type sstmt =
     SBlock of sstmt list
   | SExpr of sexpr
   | SIf of sexpr * sstmt * sstmt
   | SWhile of sexpr * sstmt
+  | SFor of sexpr * sexpr * sexpr * sstmt
   (* return *)
   | SReturn of sexpr
 
@@ -39,6 +42,7 @@ type sprogram = bind list * sfunc_def list
 let rec string_of_sexpr (t, e) =
   "(" ^ string_of_typ t ^ " : " ^ (match e with
         SLiteral(l) -> string_of_int l
+      | SFloatLit(l) -> l
       | SBoolLit(true) -> "true"
       | SBoolLit(false) -> "false"
       | SStrLit(s) -> s
@@ -49,6 +53,7 @@ let rec string_of_sexpr (t, e) =
       | SAssign(v, e) -> v ^ " = " ^ string_of_sexpr e
       | SCall(f, el) ->
           f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
+      | SNoexpr -> ""
     ) ^ ")"
 
 let rec string_of_sstmt = function
@@ -59,6 +64,9 @@ let rec string_of_sstmt = function
   | SIf(e, s1, s2) ->  "if (" ^ string_of_sexpr e ^ ")\n" ^
                        string_of_sstmt s1 ^ "else\n" ^ string_of_sstmt s2
   | SWhile(e, s) -> "while (" ^ string_of_sexpr e ^ ") " ^ string_of_sstmt s
+  | SFor(e1, e2, e3, s) ->
+      "for (" ^ string_of_sexpr e1  ^ " ; " ^ string_of_sexpr e2 ^ " ; " ^
+      string_of_sexpr e3  ^ ") " ^ string_of_sstmt s 
 
 let string_of_sfdecl fdecl =
   string_of_typ fdecl.srtyp ^ " " ^

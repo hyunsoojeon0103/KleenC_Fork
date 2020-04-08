@@ -1,16 +1,6 @@
 int main() 
 {
     (:
-	This
-	Is
-	A
-	Smiley
-	Block
-	Comment
-    :)
-
-    
-    (:
 	For now, variables MUST be declared only, NOT declared and defined,
 	at the top here, before any assignments and function calls
     :)
@@ -18,16 +8,28 @@ int main()
     heap hp;
     charseq cs;
     int i;
-
-    cs = "(0.0)  (-_-)  (^_^)";
-    i = 0;
-
-    printout("Demoing post-increment, charseq and string literals");
+    float j;
     
-    while ( i < 5 )
+    i = 10;
+    j = 3.14;
+    cs = "Demo on for loop, float, division";
+
+    printCS(cs);
+
+    printCS("Floating number");
+    printFloat(j);
+    
+    (:
+	type casting not yet supported
+	ex) 10 / 2.0 -> error
+    :)
+    printCS("Dividing 10.0 / 2.0");
+    printFloat(10.0/2.0);
+
+    printCS("For loop");
+    for(i = 0; i < 3; i++)
     {
-	printout(cs);
-	i++;
+	printInt(i);
     }
   
     return 0;
