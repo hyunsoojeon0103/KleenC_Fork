@@ -38,9 +38,9 @@ int main()
     printCS("Moding 14 % 8");
     printInt(14 % 8);
 
-    (: our compiler cannot handle negative numbers yet, so pass 5 :)
+    (: our compiler can't handle negative numbers yet :)
     printCS("Absolute Value of 5 - C backend function"); 
-    printInt( abs(5) );
+    printInt( stdlibAbs(5) );
 
     printCS("Pow (5, 2) - C backend function");
     printInt( pow( 5 , 2 ) );
