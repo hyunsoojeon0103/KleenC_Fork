@@ -9,13 +9,15 @@ int main()
     charseq cs;
     int i;
     float j;
+    int k;
     
     i = 10;
     j = 3.14;
     cs = "Demo on for loop, float, division";
-
+    k = getAbs(10);
+    
     printCS(cs);
-
+    printInt(k);
     printCS("Floating number");
     printFloat(j);
     
@@ -44,6 +46,6 @@ int main()
 	printInt(i);
     }
     
-    
+     
     return 0;
 }

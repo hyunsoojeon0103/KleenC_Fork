@@ -36,7 +36,8 @@ let check (globals, functions) =
 	[
 	  ("printInt",  [(Int, "x")], Int);
 	  ("printFloat", [(Float, "x")], Void);
-	  ("printCS", [(Charseq, "x")], Void)
+	  ("printCS", [(Charseq, "x")], Void);
+	  ("getAbs", [(Int, "x")], Int)
 	]
   in
     (*

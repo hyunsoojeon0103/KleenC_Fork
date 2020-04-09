@@ -60,6 +60,12 @@ let translate (globals, functions) =
     L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
   let printf_func : L.llvalue =
     L.declare_function "printf" printf_t the_module in
+  
+
+  let abs_t : L.lltype =
+      L.function_type i32_t [| i32_t |] in
+  let abs_func : L.llvalue =
+      L.declare_function "getAbs" abs_t the_module in
 
   (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
@@ -169,7 +175,9 @@ let translate (globals, functions) =
           "printf" builder 
       | SCall ("printCS", [e]) ->
         L.build_call printf_func [| string_format_str; (build_expr builder e) |]
-          "printf" builder  
+          "printf" builder 
+      | SCall ("getAbs", [e]) ->
+        L.build_call abs_func [| build_expr builder e |] "getAbs" builder 
       | SCall (f, args) ->
         let (fdef, fdecl) = StringMap.find f function_decls in
         let llargs = List.rev (List.map (build_expr builder) (List.rev args)) in
