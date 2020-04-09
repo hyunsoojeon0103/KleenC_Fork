@@ -37,16 +37,10 @@ let check (globals, functions) =
 	  ("printInt",  [(Int, "x")], Int);
 	  ("printFloat", [(Float, "x")], Void);
 	  ("printCS", [(Charseq, "x")], Void);
-	  ("getAbs", [(Int, "x")], Int)
+	  ("stdlibAbs", [(Int, "x")], Int);
+	  ("pow", [(Int, "x"); (Int, "y")], Int)
 	]
   in
-    (*
-    StringMap.add "print" {
-      rtyp = Int;
-      fname = "print";
-      formals = [(Int, "x")];
-      locals = []; body = [] } StringMap.empty
-  in*)
 
   (* Add function name to symbol table *)
   let add_func map fd =

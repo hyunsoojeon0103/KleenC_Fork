@@ -65,7 +65,12 @@ let translate (globals, functions) =
   let abs_t : L.lltype =
       L.function_type i32_t [| i32_t |] in
   let abs_func : L.llvalue =
-      L.declare_function "getAbs" abs_t the_module in
+      L.declare_function "abs" abs_t the_module in
+
+  let pow_t : L.lltype =
+      L.function_type i32_t [| i32_t ; i32_t |] in
+  let pow_func : L.llvalue =
+      L.declare_function "getPow" pow_t the_module in
 
   (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
@@ -176,8 +181,10 @@ let translate (globals, functions) =
       | SCall ("printCS", [e]) ->
         L.build_call printf_func [| string_format_str; (build_expr builder e) |]
           "printf" builder 
-      | SCall ("getAbs", [e]) ->
-        L.build_call abs_func [| build_expr builder e |] "getAbs" builder 
+      | SCall ("stdlibAbs", [e]) ->
+        L.build_call abs_func [| build_expr builder e |] "stdlibAbs" builder 
+      | SCall ("pow", [e1; e2]) ->
+        L.build_call pow_func [| build_expr builder e1; build_expr builder e2 |] "pow" builder 
       | SCall (f, args) ->
         let (fdef, fdecl) = StringMap.find f function_decls in
         let llargs = List.rev (List.map (build_expr builder) (List.rev args)) in

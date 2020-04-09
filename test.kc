@@ -9,22 +9,20 @@ int main()
     charseq cs;
     int i;
     float j;
-    int k;
     
     i = 10;
     j = 3.14;
     cs = "Demo on for loop, float, division";
-    k = getAbs(10);
     
     printCS(cs);
-    printInt(k);
+
     printCS("Floating number");
     printFloat(j);
     
+
     (:
 	type casting not yet supported
     :)
-    
     printCS("Adding 2.0 + 7.0");
     printFloat(2.0 + 7.0);
 
@@ -39,6 +37,13 @@ int main()
     
     printCS("Moding 14 % 8");
     printInt(14 % 8);
+
+    (: our compiler cannot handle negative numbers yet, so pass 5 :)
+    printCS("Absolute Value of 5 - C backend function"); 
+    printInt( abs(5) );
+
+    printCS("Pow (5, 2) - C backend function");
+    printInt( pow( 5 , 2 ) );
 
     printCS("For loop");
     for(i = 0; i < 3; i++)
