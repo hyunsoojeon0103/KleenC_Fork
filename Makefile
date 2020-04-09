@@ -1,5 +1,5 @@
 .PHONY: all
-all: kleenc.native funcs.o
+all: kleenc.native funcs.o realloc.c
 
 kleenc.native: scanner.mll parser.mly ast.ml semant.ml sast.ml codegen.ml kleenc.ml test.kc
 	ocamlbuild -pkgs llvm kleenc.native
@@ -10,4 +10,7 @@ clean:
 	rm -rf ocamlllvm test.out *.o *.s *.ll *.out *.exe
 
 funcs: funcs.c
+	cc -o funcs -DBUILD_TEST funcs.c
+
+realloc: realloc.c
 	cc -o funcs -DBUILD_TEST funcs.c

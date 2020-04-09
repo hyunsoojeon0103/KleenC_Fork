@@ -19,7 +19,6 @@ int main()
     printCS("Floating number");
     printFloat(j);
     
-
     (:
 	type casting not yet supported
     :)
